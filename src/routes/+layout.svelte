@@ -3,7 +3,20 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { APP_NAME } from '$lib/constants';
-	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, P } from 'flowbite-svelte';
+	import { user } from '$lib/stores';
+	import {
+		Avatar,
+		Dropdown,
+		DropdownHeader,
+		DropdownItem,
+		DropdownGroup,
+		Navbar,
+		NavBrand,
+		NavLi,
+		NavUl,
+		NavHamburger
+	} from 'flowbite-svelte';
+	import { UserCircleOutline, UserSettingsOutline } from 'flowbite-svelte-icons';
 
 	let { children } = $props();
 </script>
@@ -17,6 +30,32 @@
 	<NavBrand href={resolve('/')}>
 		<span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">{APP_NAME}</span>
 	</NavBrand>
+	<div class="flex items-center md:order-2">
+		{#if $user.username && $user.usertoken}
+			<UserSettingsOutline class="h-7 w-7 shrink-0" id="user-menu" />
+		{:else}
+			<UserCircleOutline id="user-menu" />
+		{/if}
+	</div>
+	{#if $user.username && $user.usertoken}
+		<Dropdown placement="bottom" triggeredBy="#user-menu">
+			<DropdownHeader>
+				<span class="block text-sm">Bonnie Green</span>
+			</DropdownHeader>
+			<DropdownGroup>
+				<DropdownItem>Dashboard</DropdownItem>
+				<DropdownItem>Settings</DropdownItem>
+				<DropdownItem>Earnings</DropdownItem>
+			</DropdownGroup>
+			<DropdownHeader>Sign out</DropdownHeader>
+		</Dropdown>
+	{:else}
+		<Dropdown placement="bottom" triggeredBy="#user-menu">
+			<DropdownHeader>
+				<span class="block text-sm"><a href={resolve('/log-in')}>Log In</a></span>
+			</DropdownHeader>
+		</Dropdown>
+	{/if}
 	<NavHamburger />
 	<NavUl>
 		<NavLi href={resolve('/')}>Home</NavLi>
