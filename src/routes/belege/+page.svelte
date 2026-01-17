@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import {
 		Breadcrumb,
 		BreadcrumbItem,
@@ -93,7 +94,7 @@
 </svelte:head>
 
 <Breadcrumb aria-label="Breadcrumbs" class="px-5 py-3">
-	<BreadcrumbItem href="/" home>
+	<BreadcrumbItem href={resolve('/')} home>
 		{#snippet icon()}
 			<HomeOutline class="h-4 w-4 dark:text-white" />
 		{/snippet}Home

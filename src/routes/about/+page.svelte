@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { APP_NAME } from '$lib/constants';
 	import { Breadcrumb, BreadcrumbItem, Heading, P } from 'flowbite-svelte';
 	import { HomeOutline, ChevronRightOutline } from 'flowbite-svelte-icons';
@@ -10,12 +11,12 @@
 </svelte:head>
 
 <Breadcrumb aria-label="Breadcrumbs" class="px-5 py-3">
-	<BreadcrumbItem href="/" home>
+	<BreadcrumbItem href={resolve('/')} home>
 		{#snippet icon()}
 			<HomeOutline class="h-4 w-4" />
 		{/snippet}Home
 	</BreadcrumbItem>
-	<BreadcrumbItem href="/about">
+	<BreadcrumbItem href={resolve('/about')}>
 		{#snippet icon()}
 			<ChevronRightOutline class="h-4 w-4 dark:text-white" />
 		{/snippet}

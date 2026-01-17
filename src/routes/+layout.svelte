@@ -1,4 +1,5 @@
 <script>
+	import { resolve } from '$app/paths';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { APP_NAME } from '$lib/constants';
@@ -13,14 +14,14 @@
 </svelte:head>
 
 <Navbar>
-	<NavBrand href="/">
+	<NavBrand href={resolve('/')}>
 		<span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">{APP_NAME}</span>
 	</NavBrand>
 	<NavHamburger />
 	<NavUl>
-		<NavLi href="/">Home</NavLi>
-		<NavLi href="/about">About</NavLi>
-		<NavLi href="/belege">Belege</NavLi>
+		<NavLi href={resolve('/')}>Home</NavLi>
+		<NavLi href={resolve('/about')}>About</NavLi>
+		<NavLi href={resolve('/belege')}>Belege</NavLi>
 	</NavUl>
 </Navbar>
 
