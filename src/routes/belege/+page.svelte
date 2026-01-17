@@ -11,7 +11,9 @@
 		TableHead,
 		TableHeadCell,
 		Button,
-		ButtonGroup
+		ButtonGroup,
+		Select,
+		Label
 	} from 'flowbite-svelte';
 	import {
 		HomeOutline,
@@ -25,6 +27,7 @@
 	let data = { results: [], count: 0, next: null, previous: null };
 	let loading = true;
 	let error = '';
+	let pageSize = '10';
 
 	async function fetchData(url: string) {
 		loading = true;
@@ -41,7 +44,7 @@
 	}
 
 	onMount(() => {
-		fetchData('https://dboe-backend.acdh-dev.oeaw.ac.at/api/belege-elastic-search/');
+		fetchData(`https://dboe-backend.acdh-dev.oeaw.ac.at/api/belege-elastic-search/?page_size=${pageSize}`);
 	});
 
 	function nextPage() {
@@ -50,6 +53,10 @@
 
 	function previousPage() {
 		if (data.previous) fetchData(data.previous);
+	}
+
+	function handlePageSizeChange() {
+		fetchData(`https://dboe-backend.acdh-dev.oeaw.ac.at/api/belege-elastic-search/?page_size=${pageSize}`);
 	}
 </script>
 
@@ -91,26 +98,38 @@
 			</Button>
 		</ButtonGroup>
 	</div>
-	<Table>
-		<TableHead>
-			<TableHeadCell>ID</TableHeadCell>
-			<TableHeadCell>HL</TableHeadCell>
-			<TableHeadCell>QU</TableHeadCell>
-			<TableHeadCell>POS</TableHeadCell>
-			<TableHeadCell>Page</TableHeadCell>
-			<TableHeadCell>Archivzeile</TableHeadCell>
-		</TableHead>
-		<TableBody>
-			{#each data.results as item}
-				<TableBodyRow>
-					<TableBodyCell>{item.id}</TableBodyCell>
-					<TableBodyCell>{item.hl || ''}</TableBodyCell>
-					<TableBodyCell>{item.qu || ''}</TableBodyCell>
-					<TableBodyCell>{item.pos || ''}</TableBodyCell>
-					<TableBodyCell>{item.page || ''}</TableBodyCell>
-					<TableBodyCell>{item.archivzeile || ''}</TableBodyCell>
-				</TableBodyRow>
-			{/each}
-		</TableBody>
-	</Table>
+	<div class="mt-4 mb-4 flex items-center gap-2">
+		<Label for="pageSize">Items per page:</Label>
+		<Select id="pageSize" bind:value={pageSize} onchange={handlePageSizeChange} class="w-24">
+			<option value="10">10</option>
+			<option value="20">20</option>
+			<option value="40">40</option>
+		</Select>
+	</div>
+	<div class="overflow-x-auto rounded-lg border shadow">
+		<Table>
+			<TableHead>
+				{#if data.results.length > 0}
+					{#each Object.keys(data.results[0]).filter((k) => k !== 'url') as key}
+						<TableHeadCell>{key}</TableHeadCell>
+					{/each}
+				{/if}
+			</TableHead>
+			<TableBody>
+				{#each data.results as item}
+					<TableBodyRow>
+						{#each Object.keys(item).filter((k) => k !== 'url') as key}
+							<TableBodyCell>
+								{#if Array.isArray(item[key])}
+									{item[key].length > 0 ? item[key].join(' || ') : ''}
+								{:else}
+									{item[key] !== null && item[key] !== undefined ? item[key] : ''}
+								{/if}
+							</TableBodyCell>
+						{/each}
+					</TableBodyRow>
+				{/each}
+			</TableBody>
+		</Table>
+	</div>
 {/if}
