@@ -4,6 +4,7 @@
 	import { Breadcrumb, BreadcrumbItem, Heading, Input, Label, Button, Alert } from 'flowbite-svelte';
 	import { HomeOutline, ChevronRightOutline } from 'flowbite-svelte-icons';
 	import { user } from '$lib/stores';
+	import { AUTH_URL } from '$lib/constants';
 
 	let pageTitle = 'Log in';
 	let username = '';
@@ -17,7 +18,7 @@
 		loading = true;
 
 		try {
-			const response = await fetch('https://dboe-backend.acdh-dev.oeaw.ac.at/api-token-auth/', {
+			const response = await fetch(AUTH_URL, {
 				method: 'POST',
 				headers: {
 					accept: 'application/json',
