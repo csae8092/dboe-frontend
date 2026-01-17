@@ -11,11 +11,7 @@ const config = {
 			strict: false
 		}),
 		paths: {
-			base: process.argv.includes('dev') ? '' : process.env.BASE_PATH,
-			relative: false
-		},
-		prerender: {
-			origin: 'https://csae8092.github.io'
+			base: process.argv.includes('dev') ? '' : process.env.BASE_PATH
 		}
 	}
 };
