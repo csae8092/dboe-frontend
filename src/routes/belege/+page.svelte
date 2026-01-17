@@ -13,7 +13,8 @@
 		Button,
 		ButtonGroup,
 		Select,
-		Label
+		Label,
+		TextPlaceholder
 	} from 'flowbite-svelte';
 	import {
 		HomeOutline,
@@ -107,7 +108,10 @@
 <Heading tag="h1">{pageTitle}</Heading>
 
 {#if loading}
-	<P>Loading...</P>
+	<div id="placeholder" class="mx-auto flex min-h-[80vh] w-full max-w-7xl flex-col items-center justify-center px-4">
+		<Heading tag="h2">Loading...</Heading>
+		<TextPlaceholder size="xl"></TextPlaceholder>
+	</div>
 {:else if error}
 	<P class="text-red-600">Error: {error}</P>
 {:else}
