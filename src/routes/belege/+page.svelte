@@ -9,19 +9,28 @@
 		TableBodyCell,
 		TableBodyRow,
 		TableHead,
-		TableHeadCell
+		TableHeadCell,
+		Button,
+		ButtonGroup
 	} from 'flowbite-svelte';
-	import { HomeOutline, ChevronRightOutline } from 'flowbite-svelte-icons';
+	import {
+		HomeOutline,
+		ChevronRightOutline,
+		ChevronLeftOutline,
+		ChevronDoubleRightOutline
+	} from 'flowbite-svelte-icons';
 	import { onMount } from 'svelte';
 
 	let pageTitle = 'Belege';
-	let data = { results: [], count: 0 };
+	let data = { results: [], count: 0, next: null, previous: null };
 	let loading = true;
 	let error = '';
 
-	onMount(async () => {
+	async function fetchData(url: string) {
+		loading = true;
+		error = '';
 		try {
-			const response = await fetch('https://dboe-backend.acdh-dev.oeaw.ac.at/api/belege-elastic-search/');
+			const response = await fetch(url);
 			if (!response.ok) throw new Error('Failed to fetch data');
 			data = await response.json();
 		} catch (e) {
@@ -29,7 +38,19 @@
 		} finally {
 			loading = false;
 		}
+	}
+
+	onMount(() => {
+		fetchData('https://dboe-backend.acdh-dev.oeaw.ac.at/api/belege-elastic-search/');
 	});
+
+	function nextPage() {
+		if (data.next) fetchData(data.next);
+	}
+
+	function previousPage() {
+		if (data.previous) fetchData(data.previous);
+	}
 </script>
 
 <svelte:head>
@@ -58,6 +79,18 @@
 	<P class="text-red-600">Error: {error}</P>
 {:else}
 	<P class="mb-4">Total count: {data.count}</P>
+	<div class="start mt-4 mb-2 flex">
+		<ButtonGroup>
+			<Button onclick={previousPage} disabled={!data.previous}>
+				<ChevronLeftOutline class="h-6 w-6" />
+				Previous
+			</Button>
+			<Button onclick={nextPage} disabled={!data.next}>
+				Next
+				<ChevronDoubleRightOutline class="h-6 w-6" />
+			</Button>
+		</ButtonGroup>
+	</div>
 	<Table>
 		<TableHead>
 			<TableHeadCell>ID</TableHeadCell>
