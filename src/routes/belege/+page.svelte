@@ -1,18 +1,17 @@
 <script lang="ts">
-	import { APP_NAME } from '$lib/constants';
 	import { Breadcrumb, BreadcrumbItem, Heading, P } from 'flowbite-svelte';
 	import { HomeOutline, ChevronRightOutline } from 'flowbite-svelte-icons';
-	let pageTitle = 'About the Project';
+	let pageTitle = 'Belege';
 </script>
 
 <svelte:head>
-	<title>{pageTitle}</title>
+	<title>Belege</title>
 </svelte:head>
 
 <Breadcrumb aria-label="Breadcrumbs" class="px-5 py-3">
 	<BreadcrumbItem href="/" home>
 		{#snippet icon()}
-			<HomeOutline class="h-4 w-4" />
+			<HomeOutline class="h-4 w-4 dark:text-white" />
 		{/snippet}Home
 	</BreadcrumbItem>
 	<BreadcrumbItem href="/about">
@@ -23,7 +22,7 @@
 	</BreadcrumbItem>
 </Breadcrumb>
 
-<Heading tag="h1">About {APP_NAME}</Heading>
+<Heading tag="h1">{pageTitle}</Heading>
 <P>
 	Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis
 	natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec,
