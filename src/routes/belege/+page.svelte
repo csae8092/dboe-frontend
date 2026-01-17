@@ -23,6 +23,7 @@
 	} from 'flowbite-svelte-icons';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { BELGE_BASE_URL } from '$lib/constants.js';
 
 	let pageTitle = 'Belege';
 	let data = { results: [], count: 0, next: null, previous: null };
@@ -57,7 +58,7 @@
 	$: if (urlSearch !== undefined) {
 		const pageNum = page.url.searchParams.get('page') || '1';
 		const size = page.url.searchParams.get('page_size') || '10';
-		fetchData(`https://dboe-backend.acdh-dev.oeaw.ac.at/api/belege-elastic-search/?page=${pageNum}&page_size=${size}`);
+		fetchData(`${BELGE_BASE_URL}?page=${pageNum}&page_size=${size}`);
 	}
 
 	function nextPage() {
@@ -81,7 +82,7 @@
 	function handlePageSizeChange(event: Event) {
 		const newSize = (event.target as HTMLSelectElement).value;
 		updateURL('1', newSize);
-		fetchData(`https://dboe-backend.acdh-dev.oeaw.ac.at/api/belege-elastic-search/?page=1&page_size=${newSize}`);
+		fetchData(`${BELGE_BASE_URL}?page=1&page_size=${newSize}`);
 	}
 </script>
 
