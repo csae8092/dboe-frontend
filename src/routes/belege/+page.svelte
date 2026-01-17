@@ -1,7 +1,35 @@
 <script lang="ts">
-	import { Breadcrumb, BreadcrumbItem, Heading, P } from 'flowbite-svelte';
+	import {
+		Breadcrumb,
+		BreadcrumbItem,
+		Heading,
+		P,
+		Table,
+		TableBody,
+		TableBodyCell,
+		TableBodyRow,
+		TableHead,
+		TableHeadCell
+	} from 'flowbite-svelte';
 	import { HomeOutline, ChevronRightOutline } from 'flowbite-svelte-icons';
+	import { onMount } from 'svelte';
+
 	let pageTitle = 'Belege';
+	let data = { results: [], count: 0 };
+	let loading = true;
+	let error = '';
+
+	onMount(async () => {
+		try {
+			const response = await fetch('https://dboe-backend.acdh-dev.oeaw.ac.at/api/belege-elastic-search/');
+			if (!response.ok) throw new Error('Failed to fetch data');
+			data = await response.json();
+		} catch (e) {
+			error = e.message;
+		} finally {
+			loading = false;
+		}
+	});
 </script>
 
 <svelte:head>
@@ -23,31 +51,33 @@
 </Breadcrumb>
 
 <Heading tag="h1">{pageTitle}</Heading>
-<P>
-	Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis
-	natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec,
-	pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec,
-	vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede
-	mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.
-	Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis,
-	feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies
-	nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget
-	condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel,
-	luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero
-	venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris
-	sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,
-</P>
-<P>
-	Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis
-	natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec,
-	pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec,
-	vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede
-	mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.
-	Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis,
-	feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies
-	nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget
-	condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel,
-	luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero
-	venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris
-	sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,
-</P>
+
+{#if loading}
+	<P>Loading...</P>
+{:else if error}
+	<P class="text-red-600">Error: {error}</P>
+{:else}
+	<P class="mb-4">Total count: {data.count}</P>
+	<Table>
+		<TableHead>
+			<TableHeadCell>ID</TableHeadCell>
+			<TableHeadCell>HL</TableHeadCell>
+			<TableHeadCell>QU</TableHeadCell>
+			<TableHeadCell>POS</TableHeadCell>
+			<TableHeadCell>Page</TableHeadCell>
+			<TableHeadCell>Archivzeile</TableHeadCell>
+		</TableHead>
+		<TableBody>
+			{#each data.results as item}
+				<TableBodyRow>
+					<TableBodyCell>{item.id}</TableBodyCell>
+					<TableBodyCell>{item.hl || ''}</TableBodyCell>
+					<TableBodyCell>{item.qu || ''}</TableBodyCell>
+					<TableBodyCell>{item.pos || ''}</TableBodyCell>
+					<TableBodyCell>{item.page || ''}</TableBodyCell>
+					<TableBodyCell>{item.archivzeile || ''}</TableBodyCell>
+				</TableBodyRow>
+			{/each}
+		</TableBody>
+	</Table>
+{/if}
