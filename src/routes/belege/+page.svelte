@@ -25,6 +25,7 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { BELGE_BASE_URL } from '$lib/constants.js';
+	import { browser } from '$app/environment';
 
 	let pageTitle = 'Belege';
 	let data = { results: [], count: 0, next: null, previous: null };
@@ -56,7 +57,7 @@
 		goto(`?${params.toString()}`, { replaceState: false, noScroll: true });
 	}
 
-	$: if (urlSearch !== undefined) {
+	$: if (browser && urlSearch !== undefined) {
 		const pageNum = page.url.searchParams.get('page') || '1';
 		const size = page.url.searchParams.get('page_size') || '10';
 		fetchData(`${BELGE_BASE_URL}?page=${pageNum}&page_size=${size}`);
