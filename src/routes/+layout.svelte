@@ -14,10 +14,11 @@
 		NavBrand,
 		NavLi,
 		NavUl,
-		NavHamburger
+		NavHamburger,
+		Hr
 	} from 'flowbite-svelte';
 	import { UserCircleOutline, UserSettingsOutline } from 'flowbite-svelte-icons';
-
+	import { GithubSolid } from 'flowbite-svelte-icons';
 	let { children } = $props();
 </script>
 
@@ -32,9 +33,29 @@
 	</NavBrand>
 	<div class="flex items-center md:order-2">
 		{#if $user.username && $user.usertoken}
-			<UserSettingsOutline class="h-7 w-7 shrink-0" id="user-menu" />
+			<button
+				id="user-menu"
+				type="button"
+				tabindex="0"
+				aria-label="User menu"
+				aria-expanded="false"
+				aria-haspopup="true"
+				class="flex rounded-full text-sm focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+			>
+				<UserSettingsOutline class="h-7 w-7 shrink-0" />
+			</button>
 		{:else}
-			<UserCircleOutline id="user-menu" />
+			<button
+				id="user-menu"
+				type="button"
+				tabindex="0"
+				aria-label="User menu"
+				aria-expanded="false"
+				aria-haspopup="true"
+				class="flex rounded-full text-sm focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+			>
+				<UserCircleOutline class="h-7 w-7 shrink-0" />
+			</button>
 		{/if}
 	</div>
 	{#if $user.username && $user.usertoken}
@@ -64,3 +85,10 @@
 		{@render children()}
 	</div>
 </main>
+<Hr />
+<footer class="flex justify-center">
+	<a href="https://github.com/csae8092/dboe-frontend">
+		<GithubSolid class="h-10 w-10 dark:hover:text-white" />
+		<span class="sr-only">Link to code on GitHub</span>
+	</a>
+</footer>
