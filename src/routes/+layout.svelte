@@ -40,14 +40,9 @@
 	{#if $user.username && $user.usertoken}
 		<Dropdown placement="bottom" triggeredBy="#user-menu">
 			<DropdownHeader>
-				<span class="block text-sm">Bonnie Green</span>
+				<span class="block text-sm">{$user.username}</span>
 			</DropdownHeader>
-			<DropdownGroup>
-				<DropdownItem>Dashboard</DropdownItem>
-				<DropdownItem>Settings</DropdownItem>
-				<DropdownItem>Earnings</DropdownItem>
-			</DropdownGroup>
-			<DropdownHeader>Sign out</DropdownHeader>
+			<DropdownHeader onclick={() => user.logout()}>Sign out</DropdownHeader>
 		</Dropdown>
 	{:else}
 		<Dropdown placement="bottom" triggeredBy="#user-menu">
@@ -65,7 +60,7 @@
 </Navbar>
 
 <main>
-	<div class="container mx-auto">
+	<div class="container">
 		{@render children()}
 	</div>
 </main>

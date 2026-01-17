@@ -42,4 +42,55 @@
     margin-top: 1rem;
     margin-bottom: 1rem;
   }
+
+  /* Bootstrap-like container */
+  .container {
+    width: 100%;
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  @media (min-width: 576px) {
+    .container {
+      max-width: 540px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .container {
+      max-width: 720px;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .container {
+      max-width: 960px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .container {
+      max-width: 1140px;
+      padding-right: 4rem;
+      padding-left: 4rem;
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .container {
+      max-width: 1320px;
+      padding-right: 6rem;
+      padding-left: 6rem;
+    }
+  }
+
+  .container-fluid {
+    width: 100%;
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+    margin-right: auto;
+    margin-left: auto;
+  }
 }
