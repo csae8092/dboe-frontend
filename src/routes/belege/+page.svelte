@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { user } from '$lib/stores';
 	import {
 		Breadcrumb,
 		BreadcrumbItem,
@@ -162,13 +163,18 @@
 								: item[key] !== null && item[key] !== undefined
 									? item[key]
 									: ''}
-							<td
-								data-row-id={item.id}
-								data-key={key}
-								onclick={handleCellClick(item.id, key, cellValue)}
-								class="cursor-pointer px-6 py-4"
-							>
-								{cellValue}
+							<td>
+								<button
+									data-row-id={item.id}
+									data-key={key}
+									class="cursor-pointer"
+									onclick={handleCellClick(item.id, key, cellValue)}
+									tabindex="0"
+								>
+									<div class="line-clamp-3">
+										{cellValue}
+									</div>
+								</button>
 							</td>
 						{/each}
 					</tr>
