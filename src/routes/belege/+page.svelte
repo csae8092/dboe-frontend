@@ -186,14 +186,19 @@
 			});
 
 			if (response.ok) {
-				const data = await response.json();
-				console.log(data);
+				const updatedData = await response.json();
+				console.log(updatedData);
+
+				// Update the local data state without page reload
+				data.results = data.results.map((item) => {
+					if (String(item.id) === cellData.rowId) {
+						return { ...item, [cellData.key]: updatedData[cellData.key] };
+					}
+					return item;
+				});
+
 				addToast('green', 'Cell updated successfully!');
 				modalOpen = false;
-				// Refresh the data to show updated value
-				const pageNum = page.url.searchParams.get('page') || '1';
-				const size = page.url.searchParams.get('page_size') || '10';
-				fetchData(`${BELGE_BASE_URL}?page=${pageNum}&page_size=${size}`);
 			} else {
 				const data = await response.json();
 				updateError = data['detail'] || 'Update failed';
