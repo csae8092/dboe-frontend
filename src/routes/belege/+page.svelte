@@ -197,7 +197,6 @@
 			updateError = 'Failed to connect to the server';
 			addToast('red', updateError);
 		} finally {
-			console.log(updateError);
 		}
 	}
 </script>
