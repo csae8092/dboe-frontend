@@ -12,16 +12,22 @@
 		Label,
 		TextPlaceholder,
 		Modal,
-		Input
+		Input,
+		Toast,
+		ToastContainer
 	} from 'flowbite-svelte';
 	import {
 		HomeOutline,
 		ChevronRightOutline,
 		ChevronLeftOutline,
-		ChevronDoubleRightOutline
+		ChevronDoubleRightOutline,
+		CheckCircleSolid,
+		CloseCircleSolid
 	} from 'flowbite-svelte-icons';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { fly } from 'svelte/transition';
+	import { onDestroy } from 'svelte';
 	import { BELGE_BASE_URL } from '$lib/constants.js';
 	import { browser } from '$app/environment';
 
@@ -30,8 +36,70 @@
 	let data = $state({ results: [], count: 0, next: null, previous: null });
 	let loading = $state(true);
 	let error = $state('');
+	let updateError = $state('');
 	let modalOpen = $state(false);
 	let cellData = $state({ rowId: '', key: '', value: '' });
+
+	type ToastColor = 'green' | 'red';
+
+	interface ToastItem {
+		id: number;
+		message: string;
+		color: ToastColor;
+		timeoutId?: ReturnType<typeof setTimeout>;
+		visible: boolean;
+	}
+
+	let toasts = $state<ToastItem[]>([]);
+	let nextId = $state(1);
+
+	function addToast(color: ToastColor, message: string) {
+		const newToast: ToastItem = {
+			id: nextId,
+			message,
+			color,
+			visible: true
+		};
+
+		// Auto-dismiss after 5 seconds
+		const timeoutId = setTimeout(() => {
+			dismissToast(newToast.id);
+		}, 5000);
+		newToast.timeoutId = timeoutId;
+
+		toasts = [...toasts, newToast];
+		nextId++;
+	}
+
+	function dismissToast(id: number) {
+		// Clear timeout if it exists
+		const toast = toasts.find((t) => t.id === id);
+		if (toast?.timeoutId) {
+			clearTimeout(toast.timeoutId);
+		}
+
+		// Set visible to false to trigger outro transition
+		toasts = toasts.map((t) => (t.id === id ? { ...t, visible: false } : t));
+
+		setTimeout(() => {
+			toasts = toasts.filter((t) => t.id !== id);
+		}, 300); // Slightly longer than transition duration
+	}
+
+	function handleClose(id: number) {
+		return () => {
+			dismissToast(id);
+		};
+	}
+
+	onDestroy(() => {
+		// Clear all pending timeouts on unmount
+		toasts.forEach((toast) => {
+			if (toast.timeoutId) {
+				clearTimeout(toast.timeoutId);
+			}
+		});
+	});
 
 	let pageSize = $derived(page.url.searchParams.get('page_size') || '10');
 	let urlSearch = $derived(page.url.search);
@@ -56,15 +124,6 @@
 		} finally {
 			loading = false;
 		}
-	}
-
-	async function updateCell(event) {
-		event.preventDefault();
-		console.log('Form values:', {
-			belegId: cellData.rowId,
-			belegKey: cellData.key,
-			belegValue: cellData.value
-		});
 	}
 
 	function updateURL(page: string, size: string) {
@@ -99,14 +158,53 @@
 	}
 
 	function handleCellClick(rowId: string | number, key: string, value: any) {
-		return () => {
-			if (!$user.username || !$user.usertoken) {
-				alert('foo');
-				return;
+		cellData = { rowId: String(rowId), key, value: String(value) };
+		modalOpen = true;
+	}
+
+	async function updateCell(event: Event) {
+		event.preventDefault();
+		let url: string = `${BELGE_BASE_URL}${cellData.rowId}/`;
+		let payload = `{"${cellData.key}": "${cellData.value}"}`;
+		let token = `Token ${$user.usertoken}`;
+		console.log('Form values:', {
+			belegId: cellData.rowId,
+			belegKey: cellData.key,
+			belegValue: cellData.value,
+			url: url,
+			token: token
+		});
+		try {
+			const response = await fetch(url, {
+				method: 'PATCH',
+				headers: {
+					accept: 'application/json',
+					'Content-Type': 'application/json',
+					Authorization: token
+				},
+				body: payload
+			});
+
+			if (response.ok) {
+				const data = await response.json();
+				console.log(data);
+				addToast('green', 'Cell updated successfully!');
+				modalOpen = false;
+				// Refresh the data to show updated value
+				const pageNum = page.url.searchParams.get('page') || '1';
+				const size = page.url.searchParams.get('page_size') || '10';
+				fetchData(`${BELGE_BASE_URL}?page=${pageNum}&page_size=${size}`);
+			} else {
+				const data = await response.json();
+				updateError = data['detail'] || 'Update failed';
+				addToast('red', updateError);
 			}
-			cellData = { rowId: String(rowId), key, value: String(value) };
-			modalOpen = true;
-		};
+		} catch (err) {
+			updateError = 'Failed to connect to the server';
+			addToast('red', updateError);
+		} finally {
+			console.log(updateError);
+		}
 	}
 </script>
 
@@ -184,18 +282,24 @@
 									? item[key]
 									: ''}
 							<td>
-								<button
-									data-row-id={item.id}
-									data-key={key}
-									data-value={cellValue}
-									class="cursor-pointer"
-									onclick={handleCellClick(item.id, key, cellValue)}
-									tabindex="0"
-								>
+								{#if $user.username || $user.usertoken}
+									<button
+										data-row-id={item.id}
+										data-key={key}
+										data-value={cellValue}
+										class="cursor-pointer"
+										onclick={() => handleCellClick(item.id, key, cellValue)}
+										tabindex="0"
+									>
+										<div class="line-clamp-3">
+											{cellValue}
+										</div>
+									</button>
+								{:else}
 									<div class="line-clamp-3">
 										{cellValue}
 									</div>
-								</button>
+								{/if}
 							</td>
 						{/each}
 					</tr>
@@ -230,3 +334,26 @@
 		<Button type="submit">Submit</Button>
 	</form>
 </Modal>
+
+<ToastContainer position="top-right">
+	{#each toasts as toast (toast.id)}
+		<Toast
+			color={toast.color}
+			dismissable={true}
+			transition={fly}
+			params={{ x: 200, duration: 800 }}
+			class="w-64"
+			onclose={handleClose(toast.id)}
+			bind:toastStatus={toast.visible}
+		>
+			{#snippet icon()}
+				{#if toast.color === 'green'}
+					<CheckCircleSolid class="h-5 w-5" />
+				{:else}
+					<CloseCircleSolid class="h-5 w-5" />
+				{/if}
+			{/snippet}
+			{toast.message}
+		</Toast>
+	{/each}
+</ToastContainer>
