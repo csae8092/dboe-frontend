@@ -39,6 +39,7 @@
 	let updateError = $state('');
 	let modalOpen = $state(false);
 	let cellData = $state({ rowId: '', key: '', value: '' });
+	let highlightedRowId = $state<string | null>(null);
 
 	type ToastColor = 'green' | 'red';
 
@@ -188,6 +189,12 @@
 				});
 				addToast('green', `Beleg: ${cellData.rowId} updated successfully!`);
 				modalOpen = false;
+
+				// Highlight the updated row
+				highlightedRowId = cellData.rowId;
+				setTimeout(() => {
+					highlightedRowId = null;
+				}, 2000);
 			} else {
 				const data = await response.json();
 				updateError = data['detail'] || 'Update failed';
@@ -263,8 +270,11 @@
 			</thead>
 			<tbody>
 				{#each data.results as item}
+					{@const isHighlighted = String(item.id) === highlightedRowId}
 					<tr
-						class="max-h-18 border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600"
+						class="max-h-18 border-b transition-colors duration-500 {isHighlighted
+							? 'bg-green-200 dark:bg-green-800'
+							: 'bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-600'} dark:border-gray-700"
 					>
 						{#each Object.keys(item).filter((k) => k !== 'url') as key}
 							{@const cellValue = Array.isArray(item[key])
@@ -328,7 +338,7 @@
 	</form>
 </Modal>
 
-<ToastContainer position="top-right">
+<ToastContainer position="bottom-right">
 	{#each toasts as toast (toast.id)}
 		<Toast
 			color={toast.color}
