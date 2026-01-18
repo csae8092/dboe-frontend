@@ -10,7 +10,10 @@
 		ButtonGroup,
 		Select,
 		Label,
-		TextPlaceholder
+		TextPlaceholder,
+		Modal,
+		Input,
+		CloseButton
 	} from 'flowbite-svelte';
 	import {
 		HomeOutline,
@@ -24,13 +27,22 @@
 	import { browser } from '$app/environment';
 
 	let pageTitle = 'Belege';
-	let data = { results: [], count: 0, next: null, previous: null };
-	let loading = true;
-	let error = '';
+	let data = $state({ results: [], count: 0, next: null, previous: null });
+	let loading = $state(true);
+	let error = $state('');
+	let modalOpen = $state(false);
+	let cellData = $state({ rowId: '', key: '', value: '' });
 
-	$: pageSize = page.url.searchParams.get('page_size') || '10';
+	let pageSize = $derived(page.url.searchParams.get('page_size') || '10');
+	let urlSearch = $derived(page.url.search);
 
-	$: urlSearch = page.url.search;
+	$effect(() => {
+		if (browser && urlSearch !== undefined) {
+			const pageNum = page.url.searchParams.get('page') || '1';
+			const size = page.url.searchParams.get('page_size') || '10';
+			fetchData(`${BELGE_BASE_URL}?page=${pageNum}&page_size=${size}`);
+		}
+	});
 
 	async function fetchData(url: string) {
 		loading = true;
@@ -51,12 +63,6 @@
 		params.set('page', page);
 		params.set('page_size', size);
 		goto(`?${params.toString()}`, { replaceState: false, noScroll: true });
-	}
-
-	$: if (browser && urlSearch !== undefined) {
-		const pageNum = page.url.searchParams.get('page') || '1';
-		const size = page.url.searchParams.get('page_size') || '10';
-		fetchData(`${BELGE_BASE_URL}?page=${pageNum}&page_size=${size}`);
 	}
 
 	function nextPage() {
@@ -89,7 +95,8 @@
 				alert('foo');
 				return;
 			}
-			alert(`Row ID: ${rowId}\nKey: ${key}\nValue: ${value}`);
+			cellData = { rowId: String(rowId), key, value: String(value) };
+			modalOpen = true;
 		};
 	}
 </script>
@@ -171,6 +178,7 @@
 								<button
 									data-row-id={item.id}
 									data-key={key}
+									data-value={cellValue}
 									class="cursor-pointer"
 									onclick={handleCellClick(item.id, key, cellValue)}
 									tabindex="0"
@@ -187,3 +195,37 @@
 		</table>
 	</div>
 {/if}
+
+<Modal bind:open={modalOpen} size="md" autoclose outsideclose>
+	{#snippet header()}
+		<div class="text-center">
+			<Heading tag="h3">Edit <span class="font-light">{cellData.rowId}</span></Heading>
+			<Heading tag="h4">Change value of <span class="font-light">{cellData.key}</span></Heading>
+		</div>
+	{/snippet}
+	<div class="space-y-4">
+		<div>
+			<Label class="mb-2">ID</Label>
+			<Input type="text" value={cellData.rowId} disabled />
+		</div>
+		<div>
+			<Label for="cellKey" class="mb-2">Field</Label>
+			<Input id="cellKey" type="text" value={cellData.key} disabled />
+		</div>
+		<div>
+			<Label for="cellValue" class="mb-2">{cellData.key}</Label>
+			<Input id="cellValue" type="text" bind:value={cellData.value} />
+		</div>
+	</div>
+	{#snippet footer()}
+		<Button onclick={() => (modalOpen = false)}>Cancel</Button>
+		<Button
+			color="blue"
+			onclick={() => {
+				// Handle save logic here
+				console.log('Saving:', cellData);
+				modalOpen = false;
+			}}>Save</Button
+		>
+	{/snippet}
+</Modal>
