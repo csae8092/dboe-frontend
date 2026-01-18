@@ -5,12 +5,6 @@
 		BreadcrumbItem,
 		Heading,
 		P,
-		Table,
-		TableBody,
-		TableBodyCell,
-		TableBodyRow,
-		TableHead,
-		TableHeadCell,
 		Button,
 		ButtonGroup,
 		Select,
@@ -145,17 +139,21 @@
 		</Select>
 	</div>
 	<div class="overflow-x-auto rounded-lg border shadow">
-		<Table>
-			<TableHead>
+		<table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+			<thead class="bg-gray-50 text-xs text-gray-700 uppercase dark:bg-gray-700 dark:text-gray-400">
 				{#if data.results.length > 0}
-					{#each Object.keys(data.results[0]).filter((k) => k !== 'url') as key}
-						<TableHeadCell>{key}</TableHeadCell>
-					{/each}
+					<tr>
+						{#each Object.keys(data.results[0]).filter((k) => k !== 'url') as key}
+							<th class="px-6 py-3">{key}</th>
+						{/each}
+					</tr>
 				{/if}
-			</TableHead>
-			<TableBody>
+			</thead>
+			<tbody>
 				{#each data.results as item}
-					<TableBodyRow>
+					<tr
+						class="max-h-[4.5rem] border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600"
+					>
 						{#each Object.keys(item).filter((k) => k !== 'url') as key}
 							{@const cellValue = Array.isArray(item[key])
 								? item[key].length > 0
@@ -164,18 +162,18 @@
 								: item[key] !== null && item[key] !== undefined
 									? item[key]
 									: ''}
-							<TableBodyCell
+							<td
 								data-row-id={item.id}
 								data-key={key}
 								onclick={handleCellClick(item.id, key, cellValue)}
-								class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+								class="cursor-pointer px-6 py-4"
 							>
 								{cellValue}
-							</TableBodyCell>
+							</td>
 						{/each}
-					</TableBodyRow>
+					</tr>
 				{/each}
-			</TableBody>
-		</Table>
+			</tbody>
+		</table>
 	</div>
 {/if}
