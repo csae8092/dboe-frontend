@@ -173,7 +173,7 @@
 			<tbody>
 				{#each data.results as item}
 					<tr
-						class="max-h-[4.5rem] border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600"
+						class="max-h-18 border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600"
 					>
 						{#each Object.keys(item).filter((k) => k !== 'url') as key}
 							{@const cellValue = Array.isArray(item[key])
@@ -213,13 +213,13 @@
 	{/snippet}
 	<form onsubmit={updateCell} id="updateCellForm">
 		<div class="mb-6 grid gap-6 md:grid-cols-2">
-			<div>
+			<div class="hidden">
 				<Label for="belegId" class="mb-2">{cellData.rowId}</Label>
-				<Input id="belegId" type="text" bind:value={cellData.rowId} />
+				<Input id="belegId" type="hidden" bind:value={cellData.rowId} disabled />
 			</div>
-			<div>
+			<div class="hidden">
 				<Label for="belegKey" class="mb-2">{cellData.key}</Label>
-				<Input id="belegKey" type="text" bind:value={cellData.key} />
+				<Input id="belegKey" type="hidden" bind:value={cellData.key} disabled />
 			</div>
 			<div>
 				<Label for="belegValue" class="mb-2">{cellData.key}</Label>
