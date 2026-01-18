@@ -12,8 +12,7 @@
 		Label,
 		TextPlaceholder,
 		Modal,
-		Input,
-		CloseButton
+		Input
 	} from 'flowbite-svelte';
 	import {
 		HomeOutline,
@@ -27,6 +26,7 @@
 	import { browser } from '$app/environment';
 
 	let pageTitle = 'Belege';
+
 	let data = $state({ results: [], count: 0, next: null, previous: null });
 	let loading = $state(true);
 	let error = $state('');
@@ -56,6 +56,15 @@
 		} finally {
 			loading = false;
 		}
+	}
+
+	async function updateCell(event) {
+		event.preventDefault();
+		console.log('Form values:', {
+			belegId: cellData.rowId,
+			belegKey: cellData.key,
+			belegValue: cellData.value
+		});
 	}
 
 	function updateURL(page: string, size: string) {
@@ -200,32 +209,24 @@
 	{#snippet header()}
 		<div class="text-center">
 			<Heading tag="h3">Edit <span class="font-light">{cellData.rowId}</span></Heading>
-			<Heading tag="h4">Change value of <span class="font-light">{cellData.key}</span></Heading>
 		</div>
 	{/snippet}
-	<div class="space-y-4">
-		<div>
-			<Label class="mb-2">ID</Label>
-			<Input type="text" value={cellData.rowId} disabled />
+	<form onsubmit={updateCell} id="updateCellForm">
+		<div class="mb-6 grid gap-6 md:grid-cols-2">
+			<div>
+				<Label for="belegId" class="mb-2">{cellData.rowId}</Label>
+				<Input id="belegId" type="text" bind:value={cellData.rowId} />
+			</div>
+			<div>
+				<Label for="belegKey" class="mb-2">{cellData.key}</Label>
+				<Input id="belegKey" type="text" bind:value={cellData.key} />
+			</div>
+			<div>
+				<Label for="belegValue" class="mb-2">{cellData.key}</Label>
+				<Input id="belegValue" type="text" bind:value={cellData.value} />
+			</div>
 		</div>
-		<div>
-			<Label for="cellKey" class="mb-2">Field</Label>
-			<Input id="cellKey" type="text" value={cellData.key} disabled />
-		</div>
-		<div>
-			<Label for="cellValue" class="mb-2">{cellData.key}</Label>
-			<Input id="cellValue" type="text" bind:value={cellData.value} />
-		</div>
-	</div>
-	{#snippet footer()}
-		<Button onclick={() => (modalOpen = false)}>Cancel</Button>
-		<Button
-			color="blue"
-			onclick={() => {
-				// Handle save logic here
-				console.log('Saving:', cellData);
-				modalOpen = false;
-			}}>Save</Button
-		>
-	{/snippet}
+
+		<Button type="submit">Submit</Button>
+	</form>
 </Modal>
