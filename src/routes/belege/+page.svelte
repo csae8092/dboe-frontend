@@ -87,6 +87,12 @@
 		updateURL('1', newSize);
 		fetchData(`${BELGE_BASE_URL}?page=1&page_size=${newSize}`);
 	}
+
+	function handleCellClick(rowId: string | number, key: string, value: any) {
+		return () => {
+			alert(`Row ID: ${rowId}\nKey: ${key}\nValue: ${value}`);
+		};
+	}
 </script>
 
 <svelte:head>
@@ -151,12 +157,20 @@
 				{#each data.results as item}
 					<TableBodyRow>
 						{#each Object.keys(item).filter((k) => k !== 'url') as key}
-							<TableBodyCell>
-								{#if Array.isArray(item[key])}
-									{item[key].length > 0 ? item[key].join(' || ') : ''}
-								{:else}
-									{item[key] !== null && item[key] !== undefined ? item[key] : ''}
-								{/if}
+							{@const cellValue = Array.isArray(item[key])
+								? item[key].length > 0
+									? item[key].join(' || ')
+									: ''
+								: item[key] !== null && item[key] !== undefined
+									? item[key]
+									: ''}
+							<TableBodyCell
+								data-row-id={item.id}
+								data-key={key}
+								onclick={handleCellClick(item.id, key, cellValue)}
+								class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+							>
+								{cellValue}
 							</TableBodyCell>
 						{/each}
 					</TableBodyRow>
