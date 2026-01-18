@@ -165,15 +165,8 @@
 	async function updateCell(event: Event) {
 		event.preventDefault();
 		let url: string = `${BELGE_BASE_URL}${cellData.rowId}/`;
-		let payload = `{"${cellData.key}": "${cellData.value}"}`;
-		let token = `Token ${$user.usertoken}`;
-		console.log('Form values:', {
-			belegId: cellData.rowId,
-			belegKey: cellData.key,
-			belegValue: cellData.value,
-			url: url,
-			token: token
-		});
+		let payload: string = `{"${cellData.key}": "${cellData.value}"}`;
+		let token: string = `Token ${$user.usertoken}`;
 		try {
 			const response = await fetch(url, {
 				method: 'PATCH',
@@ -187,17 +180,13 @@
 
 			if (response.ok) {
 				const updatedData = await response.json();
-				console.log(updatedData);
-
-				// Update the local data state without page reload
 				data.results = data.results.map((item) => {
 					if (String(item.id) === cellData.rowId) {
 						return { ...item, [cellData.key]: updatedData[cellData.key] };
 					}
 					return item;
 				});
-
-				addToast('green', 'Cell updated successfully!');
+				addToast('green', `Beleg: ${cellData.rowId} updated successfully!`);
 				modalOpen = false;
 			} else {
 				const data = await response.json();
