@@ -12,7 +12,7 @@
 	let error = '';
 	let loading = false;
 
-	async function handleSubmit(event) {
+	async function handleSubmit(event: Event) {
 		event.preventDefault();
 		error = '';
 		loading = true;
