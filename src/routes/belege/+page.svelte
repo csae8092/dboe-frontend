@@ -85,6 +85,10 @@
 
 	function handleCellClick(rowId: string | number, key: string, value: any) {
 		return () => {
+			if (!$user.username || !$user.usertoken) {
+				alert('foo');
+				return;
+			}
 			alert(`Row ID: ${rowId}\nKey: ${key}\nValue: ${value}`);
 		};
 	}
