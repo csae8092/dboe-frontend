@@ -43,3 +43,6 @@ export const belegKeyMapping = {
         endpoint: "api/bedeutungen/?beleg=",
     }
 };
+
+export const colKeys = Object.keys(belegKeyMapping);
+
