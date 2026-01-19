@@ -16,14 +16,7 @@
 	import EditCellModal from '$lib/components/EditCellModal.svelte';
 	import TableLoad from '$lib/components/TableLoad.svelte';
 	import TableNav from '$lib/components/TableNav.svelte';
-	import {
-		HomeOutline,
-		ChevronRightOutline,
-		ChevronLeftOutline,
-		ChevronDoubleRightOutline,
-		CheckCircleSolid,
-		CloseCircleSolid
-	} from 'flowbite-svelte-icons';
+	import { HomeOutline, CheckCircleSolid, CloseCircleSolid, ChevronRightOutline } from 'flowbite-svelte-icons';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { fly } from 'svelte/transition';
@@ -123,37 +116,6 @@
 		}
 	}
 
-	function updateURL(page, size) {
-		const params = new URLSearchParams();
-		params.set('page', page);
-		params.set('page_size', size);
-		goto(`?${params.toString()}`, { replaceState: false, noScroll: true });
-	}
-
-	function nextPage() {
-		if (data.next) {
-			const url = new URL(data.next);
-			const nextPageNum = url.searchParams.get('page') || '1';
-			updateURL(nextPageNum, pageSize);
-			fetchData(data.next);
-		}
-	}
-
-	function previousPage() {
-		if (data.previous) {
-			const url = new URL(data.previous);
-			const prevPageNum = url.searchParams.get('page') || '1';
-			updateURL(prevPageNum, pageSize);
-			fetchData(data.previous);
-		}
-	}
-
-	function handlePageSizeChange(event) {
-		const newSize = event.target.value;
-		updateURL('1', newSize);
-		fetchData(`${BELGE_BASE_URL}?page=1&page_size=${newSize}`);
-	}
-
 	function handleCellClick(rowId, key, value) {
 		cellData = { rowId: String(rowId), key, value: String(value) };
 		modalOpen = true;
@@ -207,7 +169,8 @@
 {:else if error}
 	<P class="text-red-600">Error: {error}</P>
 {:else}
-	<TableNav bind:pageSize {data} {previousPage} {nextPage} {handlePageSizeChange} />
+	<TableNav bind:pageSize bind:data bind:loading bind:error apiBaseUrl={BELGE_BASE_URL} />
+
 	<div class="overflow-x-auto rounded-lg border shadow">
 		<table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
 			<thead class="bg-gray-50 text-xs text-gray-700 uppercase dark:bg-gray-700 dark:text-gray-400">
