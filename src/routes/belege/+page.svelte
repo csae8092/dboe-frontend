@@ -29,6 +29,7 @@
 	import { fly } from 'svelte/transition';
 	import { onDestroy } from 'svelte';
 	import { BELGE_BASE_URL } from '$lib/constants.js';
+	import { colKeys, belegKeyMapping } from '$lib/belegkeys';
 	import { browser } from '$app/environment';
 
 	let pageTitle = 'Belege';
@@ -262,8 +263,8 @@
 			<thead class="bg-gray-50 text-xs text-gray-700 uppercase dark:bg-gray-700 dark:text-gray-400">
 				{#if data.results.length > 0}
 					<tr>
-						{#each Object.keys(data.results[0]).filter((k) => k !== 'url') as key}
-							<th class="px-6 py-3">{key}</th>
+						{#each Object.keys(data.results[0]).filter((k) => colKeys.includes(k)) as key}
+							<th class="px-6 py-3">{belegKeyMapping[key]['label']}</th>
 						{/each}
 					</tr>
 				{/if}
@@ -276,7 +277,7 @@
 							? 'bg-green-200 dark:bg-green-800'
 							: 'bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-600'} dark:border-gray-700"
 					>
-						{#each Object.keys(item).filter((k) => k !== 'url') as key}
+						{#each Object.keys(item).filter((k) => colKeys.includes(k)) as key}
 							{@const cellValue = Array.isArray(item[key])
 								? item[key].length > 0
 									? item[key].join(' || ')
@@ -284,8 +285,8 @@
 								: item[key] !== null && item[key] !== undefined
 									? item[key]
 									: ''}
-							<td>
-								{#if $user.username || $user.usertoken}
+							<td class="px-3 py-2">
+								{#if $user.username && $user.usertoken && belegKeyMapping[key]?.modify}
 									<button
 										data-row-id={item.id}
 										data-key={key}
@@ -333,7 +334,6 @@
 				<Input id="belegValue" type="text" bind:value={cellData.value} />
 			</div>
 		</div>
-
 		<Button type="submit">Submit</Button>
 	</form>
 </Modal>
