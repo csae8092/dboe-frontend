@@ -24,6 +24,7 @@
 	import { BELGE_BASE_URL } from '$lib/constants.js';
 	import { colKeys, belegKeyMapping } from '$lib/belegkeys';
 	import { browser } from '$app/environment';
+	import Mybreadcrumb from '$lib/components/Mybreadcrumb.svelte';
 
 	let pageTitle = 'Belege';
 
@@ -148,19 +149,7 @@
 	<title>Belege</title>
 </svelte:head>
 
-<Breadcrumb aria-label="Breadcrumbs" class="px-5 py-3">
-	<BreadcrumbItem href={resolve('/')} home>
-		{#snippet icon()}
-			<HomeOutline class="h-4 w-4 dark:text-white" />
-		{/snippet}Home
-	</BreadcrumbItem>
-	<BreadcrumbItem>
-		{#snippet icon()}
-			<ChevronRightOutline class="h-4 w-4 dark:text-white" />
-		{/snippet}
-		{pageTitle}
-	</BreadcrumbItem>
-</Breadcrumb>
+<Mybreadcrumb {pageTitle}></Mybreadcrumb>
 
 <Heading tag="h1">{pageTitle}</Heading>
 

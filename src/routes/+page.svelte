@@ -1,17 +1,12 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import Mybreadcrumb from '$lib/components/Mybreadcrumb.svelte';
 	import { APP_NAME } from '$lib/constants';
-	import { Breadcrumb, BreadcrumbItem, Heading, P } from 'flowbite-svelte';
-	import { HomeOutline } from 'flowbite-svelte-icons';
+	import { Heading, P } from 'flowbite-svelte';
+
+	let pageTitle = 'About';
 </script>
 
-<Breadcrumb aria-label="Breadcrumbs" class="px-5 py-3">
-	<BreadcrumbItem href={resolve('/')} home>
-		{#snippet icon()}
-			<HomeOutline class="me-2 h-4 w-4" />
-		{/snippet}Home
-	</BreadcrumbItem>
-</Breadcrumb>
+<Mybreadcrumb {pageTitle}></Mybreadcrumb>
 
 <Heading tag="h1">{APP_NAME}</Heading>
 <P>
