@@ -158,7 +158,7 @@
 {:else if error}
 	<P class="text-red-600">Error: {error}</P>
 {:else}
-	<TableNav bind:pageSize bind:data bind:loading bind:error apiBaseUrl={BELGE_BASE_URL} />
+	<TableNav bind:pageSize bind:data bind:loading bind:error />
 
 	<div class="overflow-x-auto rounded-lg border shadow">
 		<table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
