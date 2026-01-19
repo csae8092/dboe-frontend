@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 	import { resolve } from '$app/paths';
 	import { user } from '$lib/stores';
 	import {
@@ -10,20 +10,13 @@
 		ButtonGroup,
 		Select,
 		Label,
-		TextPlaceholder,
-		Modal,
-		Input,
 		Toast,
 		ToastContainer
 	} from 'flowbite-svelte';
-	import {
-		HomeOutline,
-		ChevronRightOutline,
-		ChevronLeftOutline,
-		ChevronDoubleRightOutline,
-		CheckCircleSolid,
-		CloseCircleSolid
-	} from 'flowbite-svelte-icons';
+	import EditCellModal from '$lib/components/EditCellModal.svelte';
+	import TableLoad from '$lib/components/TableLoad.svelte';
+	import TableNav from '$lib/components/TableNav.svelte';
+	import { HomeOutline, CheckCircleSolid, CloseCircleSolid, ChevronRightOutline } from 'flowbite-svelte-icons';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { fly } from 'svelte/transition';
@@ -37,26 +30,15 @@
 	let data = $state({ results: [], count: 0, next: null, previous: null });
 	let loading = $state(true);
 	let error = $state('');
-	let updateError = $state('');
 	let modalOpen = $state(false);
 	let cellData = $state({ rowId: '', key: '', value: '' });
-	let highlightedRowId = $state<string | null>(null);
+	let highlightedRowId = $state(null);
 
-	type ToastColor = 'green' | 'red';
-
-	interface ToastItem {
-		id: number;
-		message: string;
-		color: ToastColor;
-		timeoutId?: ReturnType<typeof setTimeout>;
-		visible: boolean;
-	}
-
-	let toasts = $state<ToastItem[]>([]);
+	let toasts = $state([]);
 	let nextId = $state(1);
 
-	function addToast(color: ToastColor, message: string) {
-		const newToast: ToastItem = {
+	function addToast(color, message) {
+		const newToast = {
 			id: nextId,
 			message,
 			color,
@@ -73,7 +55,7 @@
 		nextId++;
 	}
 
-	function dismissToast(id: number) {
+	function dismissToast(id) {
 		// Clear timeout if it exists
 		const toast = toasts.find((t) => t.id === id);
 		if (toast?.timeoutId) {
@@ -88,7 +70,7 @@
 		}, 300); // Slightly longer than transition duration
 	}
 
-	function handleClose(id: number) {
+	function handleClose(id) {
 		return () => {
 			dismissToast(id);
 		};
@@ -103,8 +85,14 @@
 		});
 	});
 
-	let pageSize = $derived(page.url.searchParams.get('page_size') || '10');
+	let pageSize = $state('10');
 	let urlSearch = $derived(page.url.search);
+
+	$effect(() => {
+		if (browser && urlSearch !== undefined) {
+			pageSize = page.url.searchParams.get('page_size') || '10';
+		}
+	});
 
 	$effect(() => {
 		if (browser && urlSearch !== undefined) {
@@ -114,7 +102,7 @@
 		}
 	});
 
-	async function fetchData(url: string) {
+	async function fetchData(url) {
 		loading = true;
 		error = '';
 		try {
@@ -128,84 +116,31 @@
 		}
 	}
 
-	function updateURL(page: string, size: string) {
-		const params = new URLSearchParams();
-		params.set('page', page);
-		params.set('page_size', size);
-		goto(`?${params.toString()}`, { replaceState: false, noScroll: true });
-	}
-
-	function nextPage() {
-		if (data.next) {
-			const url = new URL(data.next);
-			const nextPageNum = url.searchParams.get('page') || '1';
-			updateURL(nextPageNum, pageSize);
-			fetchData(data.next);
-		}
-	}
-
-	function previousPage() {
-		if (data.previous) {
-			const url = new URL(data.previous);
-			const prevPageNum = url.searchParams.get('page') || '1';
-			updateURL(prevPageNum, pageSize);
-			fetchData(data.previous);
-		}
-	}
-
-	function handlePageSizeChange(event: Event) {
-		const newSize = (event.target as HTMLSelectElement).value;
-		updateURL('1', newSize);
-		fetchData(`${BELGE_BASE_URL}?page=1&page_size=${newSize}`);
-	}
-
-	function handleCellClick(rowId: string | number, key: string, value: any) {
+	function handleCellClick(rowId, key, value) {
 		cellData = { rowId: String(rowId), key, value: String(value) };
 		modalOpen = true;
 	}
 
-	async function updateCell(event: Event) {
-		event.preventDefault();
-		let url: string = `${BELGE_BASE_URL}${cellData.rowId}/`;
-		let payload: string = `{"${cellData.key}": "${cellData.value}"}`;
-		let token: string = `Token ${$user.usertoken}`;
-		try {
-			const response = await fetch(url, {
-				method: 'PATCH',
-				headers: {
-					accept: 'application/json',
-					'Content-Type': 'application/json',
-					Authorization: token
-				},
-				body: payload
-			});
-
-			if (response.ok) {
-				const updatedData = await response.json();
-				data.results = data.results.map((item) => {
-					if (String(item.id) === cellData.rowId) {
-						return { ...item, [cellData.key]: updatedData[cellData.key] };
-					}
-					return item;
-				});
-				addToast('green', `Beleg: ${cellData.rowId} updated successfully!`);
-				modalOpen = false;
-
-				// Highlight the updated row
-				highlightedRowId = cellData.rowId;
-				setTimeout(() => {
-					highlightedRowId = null;
-				}, 2000);
-			} else {
-				const data = await response.json();
-				updateError = data['detail'] || 'Update failed';
-				addToast('red', updateError);
+	function handleModalSuccess(rowId, key, updatedValue) {
+		data.results = data.results.map((item) => {
+			if (String(item.id) === rowId) {
+				return { ...item, [key]: updatedValue };
 			}
-		} catch (err) {
-			updateError = 'Failed to connect to the server';
-			addToast('red', updateError);
-		} finally {
-		}
+			return item;
+		});
+		addToast('green', `Beleg: ${rowId} updated successfully!`);
+		highlightedRowId = rowId;
+		setTimeout(() => {
+			highlightedRowId = null;
+		}, 2000);
+	}
+
+	function handleModalError(message) {
+		addToast('red', message);
+	}
+
+	function handleModalClose() {
+		modalOpen = false;
 	}
 </script>
 
@@ -230,34 +165,12 @@
 <Heading tag="h1">{pageTitle}</Heading>
 
 {#if loading}
-	<div id="placeholder" class="mx-auto flex min-h-[80vh] w-full max-w-7xl flex-col items-center justify-center px-4">
-		<Heading tag="h2">Loading...</Heading>
-		<TextPlaceholder size="xl"></TextPlaceholder>
-	</div>
+	<TableLoad></TableLoad>
 {:else if error}
 	<P class="text-red-600">Error: {error}</P>
 {:else}
-	<P class="mb-4">Total count: {data.count}</P>
-	<div class="start mt-4 mb-2 flex">
-		<ButtonGroup>
-			<Button onclick={previousPage} disabled={!data.previous}>
-				<ChevronLeftOutline class="h-6 w-6" />
-				Previous
-			</Button>
-			<Button onclick={nextPage} disabled={!data.next}>
-				Next
-				<ChevronDoubleRightOutline class="h-6 w-6" />
-			</Button>
-		</ButtonGroup>
-	</div>
-	<div class="mt-4 mb-4 flex items-center gap-2">
-		<Label for="pageSize">Items per page:</Label>
-		<Select id="pageSize" bind:value={pageSize} onchange={handlePageSizeChange} class="w-24">
-			<option value="10">10</option>
-			<option value="20">20</option>
-			<option value="40">40</option>
-		</Select>
-	</div>
+	<TableNav bind:pageSize bind:data bind:loading bind:error apiBaseUrl={BELGE_BASE_URL} />
+
 	<div class="overflow-x-auto rounded-lg border shadow">
 		<table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
 			<thead class="bg-gray-50 text-xs text-gray-700 uppercase dark:bg-gray-700 dark:text-gray-400">
@@ -313,30 +226,15 @@
 	</div>
 {/if}
 
-<Modal bind:open={modalOpen} size="md" autoclose outsideclose>
-	{#snippet header()}
-		<div class="text-center">
-			<Heading tag="h3">Edit <span class="font-light">{cellData.rowId}</span></Heading>
-		</div>
-	{/snippet}
-	<form onsubmit={updateCell} id="updateCellForm">
-		<div class="mb-6 grid gap-6 md:grid-cols-2">
-			<div class="hidden">
-				<Label for="belegId" class="mb-2">{cellData.rowId}</Label>
-				<Input id="belegId" type="hidden" bind:value={cellData.rowId} disabled />
-			</div>
-			<div class="hidden">
-				<Label for="belegKey" class="mb-2">{cellData.key}</Label>
-				<Input id="belegKey" type="hidden" bind:value={cellData.key} disabled />
-			</div>
-			<div>
-				<Label for="belegValue" class="mb-2">{cellData.key}</Label>
-				<Input id="belegValue" type="text" bind:value={cellData.value} />
-			</div>
-		</div>
-		<Button type="submit">Submit</Button>
-	</form>
-</Modal>
+<EditCellModal
+	bind:open={modalOpen}
+	{cellData}
+	apiBaseUrl={BELGE_BASE_URL}
+	userToken={$user.usertoken}
+	onClose={handleModalClose}
+	onSuccess={handleModalSuccess}
+	onError={handleModalError}
+/>
 
 <ToastContainer position="bottom-right">
 	{#each toasts as toast (toast.id)}
