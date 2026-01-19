@@ -1,7 +1,8 @@
 <svelte:options runes={true} />
 
 <script>
-	import { Heading, P } from 'flowbite-svelte';
+	import { Button, Heading, Label, Input, Modal, P } from 'flowbite-svelte';
+	import { EditOutline } from 'flowbite-svelte-icons';
 	import { SENSE_BASE_URL } from '$lib/constants.js';
 	import { usePagination } from '$lib/usePagination.svelte.js';
 
@@ -11,6 +12,21 @@
 
 	const pageTitle = 'Bedeutungen';
 	const pagination = usePagination(SENSE_BASE_URL);
+
+	let modalOpen = $state(false);
+	let selectedItem = $state(null);
+	const openEditRowModal = (item) => {
+		selectedItem = item;
+		modalOpen = true;
+	};
+
+	const senseNoEditFields = ['url', 'id', 'beleg', 'orig_xml', 'number'];
+
+	async function handleSubmit(event) {
+		event.preventDefault();
+		console.log(selectedItem);
+		modalOpen = false;
+	}
 </script>
 
 <svelte:head>
@@ -35,6 +51,7 @@
 			<thead class="bg-gray-50 text-xs text-gray-700 uppercase dark:bg-gray-700 dark:text-gray-400">
 				{#if pagination.data.results.length > 0}
 					<tr>
+						<th class="px-6 py-3">Edit</th>
 						{#each Object.keys(pagination.data.results[0]) as key}
 							<th class="px-6 py-3">{key}</th>
 						{/each}
@@ -44,6 +61,11 @@
 			<tbody>
 				{#each pagination.data.results as item}
 					<tr class="max-h-18 border-b transition-colors duration-500">
+						<td class="px-3 py-2">
+							<Button onclick={() => openEditRowModal(item)}>
+								<EditOutline class="h-6 w-6 shrink-0" /><span class="sr-only">edit {item.id}</span>
+							</Button>
+						</td>
 						{#each Object.keys(item) as key}
 							{@const cellValue = Array.isArray(item[key])
 								? item[key].length > 0
@@ -64,3 +86,26 @@
 		</table>
 	</div>
 {/if}
+
+<Modal form bind:open={modalOpen}>
+	{#if selectedItem}
+		<div class="text-center">
+			<Heading tag="h3">Edit <span class="font-light">{selectedItem.id}</span></Heading>
+		</div>
+		<div class="space-y-4">
+			<form onsubmit={handleSubmit} id="updateCellForm">
+				<div class="mb-6 grid gap-6 md:grid-cols-2">
+					{#each Object.keys(selectedItem) as key}
+						{#if !senseNoEditFields.includes(key)}
+							<div>
+								<Label for={key}>{key}</Label>
+								<Input type="text" id={key} bind:value={selectedItem[key]} />
+							</div>
+						{/if}
+					{/each}
+				</div>
+				<Button type="submit">Submit</Button>
+			</form>
+		</div>
+	{/if}
+</Modal>
