@@ -1,36 +1,21 @@
 <script>
 	import { resolve } from '$app/paths';
 	import { user } from '$lib/stores';
-	import {
-		Breadcrumb,
-		BreadcrumbItem,
-		Heading,
-		P,
-		Button,
-		ButtonGroup,
-		Select,
-		Label,
-		Toast,
-		ToastContainer
-	} from 'flowbite-svelte';
+	import { Heading, P, Toast, ToastContainer } from 'flowbite-svelte';
 	import EditCellModal from '$lib/components/EditCellModal.svelte';
 	import TableLoad from '$lib/components/TableLoad.svelte';
 	import TableNav from '$lib/components/TableNav.svelte';
-	import { HomeOutline, CheckCircleSolid, CloseCircleSolid, ChevronRightOutline } from 'flowbite-svelte-icons';
-	import { page } from '$app/state';
-	import { goto } from '$app/navigation';
+	import { CheckCircleSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
 	import { fly } from 'svelte/transition';
 	import { onDestroy } from 'svelte';
 	import { BELGE_BASE_URL } from '$lib/constants.js';
 	import { colKeys, belegKeyMapping } from '$lib/belegkeys';
-	import { browser } from '$app/environment';
 	import Mybreadcrumb from '$lib/components/Mybreadcrumb.svelte';
+	import { usePagination } from '$lib/usePagination.svelte.js';
 
-	let pageTitle = 'Belege';
+	const pageTitle = 'Belege';
+	const pagination = usePagination(BELGE_BASE_URL);
 
-	let data = $state({ results: [], count: 0, next: null, previous: null });
-	let loading = $state(true);
-	let error = $state('');
 	let modalOpen = $state(false);
 	let cellData = $state({ rowId: '', key: '', value: '' });
 	let highlightedRowId = $state(null);
@@ -86,44 +71,13 @@
 		});
 	});
 
-	let pageSize = $state('10');
-	let urlSearch = $derived(page.url.search);
-
-	$effect(() => {
-		if (browser && urlSearch !== undefined) {
-			pageSize = page.url.searchParams.get('page_size') || '10';
-		}
-	});
-
-	$effect(() => {
-		if (browser && urlSearch !== undefined) {
-			const pageNum = page.url.searchParams.get('page') || '1';
-			const size = page.url.searchParams.get('page_size') || '10';
-			fetchData(`${BELGE_BASE_URL}?page=${pageNum}&page_size=${size}`);
-		}
-	});
-
-	async function fetchData(url) {
-		loading = true;
-		error = '';
-		try {
-			const response = await fetch(url);
-			if (!response.ok) throw new Error('Failed to fetch data');
-			data = await response.json();
-		} catch (e) {
-			error = e.message;
-		} finally {
-			loading = false;
-		}
-	}
-
 	function handleCellClick(rowId, key, value) {
 		cellData = { rowId: String(rowId), key, value: String(value) };
 		modalOpen = true;
 	}
 
 	function handleModalSuccess(rowId, key, updatedValue) {
-		data.results = data.results.map((item) => {
+		pagination.data.results = pagination.data.results.map((item) => {
 			if (String(item.id) === rowId) {
 				return { ...item, [key]: updatedValue };
 			}
@@ -153,26 +107,31 @@
 
 <Heading tag="h1">{pageTitle}</Heading>
 
-{#if loading}
+{#if pagination.loading}
 	<TableLoad></TableLoad>
-{:else if error}
-	<P class="text-red-600">Error: {error}</P>
+{:else if pagination.error}
+	<P class="text-red-600">Error: {pagination.error}</P>
 {:else}
-	<TableNav bind:pageSize bind:data bind:loading bind:error />
+	<TableNav
+		bind:pageSize={pagination.pageSize}
+		bind:data={pagination.data}
+		bind:loading={pagination.loading}
+		bind:error={pagination.error}
+	/>
 
 	<div class="overflow-x-auto rounded-lg border shadow">
 		<table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
 			<thead class="bg-gray-50 text-xs text-gray-700 uppercase dark:bg-gray-700 dark:text-gray-400">
-				{#if data.results.length > 0}
+				{#if pagination.data.results.length > 0}
 					<tr>
-						{#each Object.keys(data.results[0]).filter((k) => colKeys.includes(k)) as key}
+						{#each Object.keys(pagination.data.results[0]).filter((k) => colKeys.includes(k)) as key}
 							<th class="px-6 py-3">{belegKeyMapping[key]['label']}</th>
 						{/each}
 					</tr>
 				{/if}
 			</thead>
 			<tbody>
-				{#each data.results as item}
+				{#each pagination.data.results as item}
 					{@const isHighlighted = String(item.id) === highlightedRowId}
 					<tr
 						class="max-h-18 border-b transition-colors duration-500 {isHighlighted
