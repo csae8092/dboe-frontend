@@ -2,11 +2,12 @@
 
 <script>
 	import { Heading, P } from 'flowbite-svelte';
-	import Mybreadcrumb from '$lib/components/Mybreadcrumb.svelte';
 	import { SENSE_BASE_URL } from '$lib/constants.js';
+	import { usePagination } from '$lib/usePagination.svelte.js';
+
+	import Mybreadcrumb from '$lib/components/Mybreadcrumb.svelte';
 	import TableLoad from '$lib/components/TableLoad.svelte';
 	import TableNav from '$lib/components/TableNav.svelte';
-	import { usePagination } from '$lib/usePagination.svelte.js';
 
 	const pageTitle = 'Bedeutungen';
 	const pagination = usePagination(SENSE_BASE_URL);
