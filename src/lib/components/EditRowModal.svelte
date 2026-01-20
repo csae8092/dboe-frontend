@@ -34,12 +34,13 @@
 			} else {
 				const data = await response.json();
 				const errorMessage = data['detail'] || 'Update failed';
-				onError(errorMessage);
+				alert(errorMessage);
+				open = true;
 			}
 		} catch (err) {
-			console.log('Failed to connect to the server');
+			alert(err);
+			open = true;
 		}
-		open = false;
 	}
 </script>
 
