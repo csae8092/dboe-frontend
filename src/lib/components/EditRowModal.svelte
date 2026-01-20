@@ -4,13 +4,22 @@
 	import { Modal, Input, Label, Button, Heading } from 'flowbite-svelte';
 	let { open = $bindable(false), rowData, ignoreFields, userToken } = $props();
 
+	// Create editable copy to preserve original data
+	let editableData = $state({});
+
+	$effect(() => {
+		if (rowData && open) {
+			editableData = JSON.parse(JSON.stringify(rowData));
+		}
+	});
+
 	async function handleSubmit(event) {
 		event.preventDefault();
-		let url = rowData.url;
-		let filteredData = Object.keys(rowData)
-			.filter((key) => !ignoreFields.includes(key) && rowData[key] !== null)
+		let url = editableData.url;
+		let filteredData = Object.keys(editableData)
+			.filter((key) => !ignoreFields.includes(key) && editableData[key] !== null)
 			.reduce((obj, key) => {
-				obj[key] = rowData[key];
+				obj[key] = editableData[key];
 				return obj;
 			}, {});
 		let payload = JSON.stringify(filteredData);
@@ -30,6 +39,8 @@
 			if (response.ok) {
 				const data = await response.json();
 				console.log(data);
+				// Update original rowData with successful changes
+				Object.assign(rowData, editableData);
 				open = false;
 			} else {
 				const data = await response.json();
@@ -52,11 +63,11 @@
 		<div class="space-y-4">
 			<form onsubmit={handleSubmit} id="updateCellForm">
 				<div class="mb-6 grid gap-6 md:grid-cols-2">
-					{#each Object.keys(rowData) as key}
+					{#each Object.keys(editableData) as key}
 						{#if !ignoreFields.includes(key)}
 							<div>
 								<Label for={key}>{key}</Label>
-								<Input type="text" id={key} bind:value={rowData[key]} />
+								<Input type="text" id={key} bind:value={editableData[key]} />
 							</div>
 						{/if}
 					{/each}
