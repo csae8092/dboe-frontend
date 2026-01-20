@@ -1,14 +1,16 @@
 <svelte:options runes={true} />
 
 <script>
-	import { Button, Heading, Label, Input, Modal, P } from 'flowbite-svelte';
+	import { Button, Heading, P } from 'flowbite-svelte';
 	import { EditOutline } from 'flowbite-svelte-icons';
 	import { SENSE_BASE_URL } from '$lib/constants.js';
 	import { usePagination } from '$lib/usePagination.svelte.js';
+	import { user } from '$lib/stores';
 
 	import Mybreadcrumb from '$lib/components/Mybreadcrumb.svelte';
 	import TableLoad from '$lib/components/TableLoad.svelte';
 	import TableNav from '$lib/components/TableNav.svelte';
+	import EditRowModal from '$lib/components/EditRowModal.svelte';
 
 	const pageTitle = 'Bedeutungen';
 	const pagination = usePagination(SENSE_BASE_URL);
@@ -20,13 +22,7 @@
 		modalOpen = true;
 	};
 
-	const senseNoEditFields = ['url', 'id', 'beleg', 'orig_xml', 'number'];
-
-	async function handleSubmit(event) {
-		event.preventDefault();
-		console.log(selectedItem);
-		modalOpen = false;
-	}
+	const ignoreFields = ['url', 'id', 'beleg', 'orig_xml', 'number'];
 </script>
 
 <svelte:head>
@@ -87,25 +83,6 @@
 	</div>
 {/if}
 
-<Modal form bind:open={modalOpen}>
-	{#if selectedItem}
-		<div class="text-center">
-			<Heading tag="h3">Edit <span class="font-light">{selectedItem.id}</span></Heading>
-		</div>
-		<div class="space-y-4">
-			<form onsubmit={handleSubmit} id="updateCellForm">
-				<div class="mb-6 grid gap-6 md:grid-cols-2">
-					{#each Object.keys(selectedItem) as key}
-						{#if !senseNoEditFields.includes(key)}
-							<div>
-								<Label for={key}>{key}</Label>
-								<Input type="text" id={key} bind:value={selectedItem[key]} />
-							</div>
-						{/if}
-					{/each}
-				</div>
-				<Button type="submit">Submit</Button>
-			</form>
-		</div>
-	{/if}
-</Modal>
+<EditRowModal bind:open={modalOpen} rowData={selectedItem} userToken={$user.usertoken} {ignoreFields}>
+	{user}</EditRowModal
+>
