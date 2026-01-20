@@ -5,3 +5,9 @@ export const API_BASE_URL = env.PUBLIC_API_BASE_URL || 'https://dboe-backend.acd
 export const BELGE_BASE_URL = `${API_BASE_URL}api/belege-elastic-search/`;
 export const SENSE_BASE_URL = `${API_BASE_URL}api/bedeutungen/`;
 export const AUTH_URL = `${API_BASE_URL}api-token-auth/`;
+
+
+export const ROUTE_MAPPER = {
+    bedeutung: SENSE_BASE_URL,
+    kontexte: `${API_BASE_URL}api/kontexte/`
+}
