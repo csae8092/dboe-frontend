@@ -78,6 +78,7 @@
 			<NavLi href={resolve('/')}>Home</NavLi>
 			<NavLi href={resolve('/about')}>About</NavLi>
 			<NavLi href={resolve('/belege')}>Belege</NavLi>
+			<NavLi href={resolve('/beleg-rows')}>Belege (neu)</NavLi>
 			<NavLi href={resolve('/senses')}>Bedeutungen</NavLi>
 		</NavUl>
 	</Navbar>
