@@ -1,16 +1,28 @@
 <svelte:options runes={true} />
 
 <script>
-	import { Heading, P } from 'flowbite-svelte';
+	import { Button, Heading, P } from 'flowbite-svelte';
+	import { EditOutline } from 'flowbite-svelte-icons';
 	import { SENSE_BASE_URL } from '$lib/constants.js';
 	import { usePagination } from '$lib/usePagination.svelte.js';
+	import { user } from '$lib/stores';
 
 	import Mybreadcrumb from '$lib/components/Mybreadcrumb.svelte';
 	import TableLoad from '$lib/components/TableLoad.svelte';
 	import TableNav from '$lib/components/TableNav.svelte';
+	import EditRowModal from '$lib/components/EditRowModal.svelte';
 
 	const pageTitle = 'Bedeutungen';
 	const pagination = usePagination(SENSE_BASE_URL);
+
+	let modalOpen = $state(false);
+	let selectedItem = $state(null);
+	const openEditRowModal = (item) => {
+		selectedItem = item;
+		modalOpen = true;
+	};
+
+	const ignoreFields = ['url', 'id', 'beleg', 'orig_xml', 'number'];
 </script>
 
 <svelte:head>
@@ -35,6 +47,7 @@
 			<thead class="bg-gray-50 text-xs text-gray-700 uppercase dark:bg-gray-700 dark:text-gray-400">
 				{#if pagination.data.results.length > 0}
 					<tr>
+						<th class="px-6 py-3">Edit</th>
 						{#each Object.keys(pagination.data.results[0]) as key}
 							<th class="px-6 py-3">{key}</th>
 						{/each}
@@ -44,6 +57,11 @@
 			<tbody>
 				{#each pagination.data.results as item}
 					<tr class="max-h-18 border-b transition-colors duration-500">
+						<td class="px-3 py-2">
+							<Button onclick={() => openEditRowModal(item)}>
+								<EditOutline class="h-6 w-6 shrink-0" /><span class="sr-only">edit {item.id}</span>
+							</Button>
+						</td>
 						{#each Object.keys(item) as key}
 							{@const cellValue = Array.isArray(item[key])
 								? item[key].length > 0
@@ -64,3 +82,7 @@
 		</table>
 	</div>
 {/if}
+
+<EditRowModal bind:open={modalOpen} rowData={selectedItem} userToken={$user.usertoken} {ignoreFields}>
+	{user}</EditRowModal
+>
