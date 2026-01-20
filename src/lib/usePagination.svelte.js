@@ -1,11 +1,6 @@
 import { browser } from '$app/environment';
 import { page } from '$app/state';
 
-/**
- * Composable for handling paginated data fetching in Svelte 5
- * @param {string} apiBaseUrl - The base URL for the API endpoint
- * @returns {Object} - Reactive state and utilities for pagination
- */
 export function usePagination(apiBaseUrl) {
 	let data = $state({ results: [], count: 0, next: null, previous: null });
 	let loading = $state(true);
@@ -24,9 +19,20 @@ export function usePagination(apiBaseUrl) {
 	// Fetch data when URL changes
 	$effect(() => {
 		if (browser && urlSearch !== undefined) {
-			const pageNum = page.url.searchParams.get('page') || '1';
-			const size = page.url.searchParams.get('page_size') || '10';
-			fetchData(`${apiBaseUrl}?page=${pageNum}&page_size=${size}`);
+			// Parse the base URL to extract any existing query parameters
+			const [baseUrl, existingQuery] = apiBaseUrl.split('?');
+			const params = new URLSearchParams(existingQuery || '');
+			
+			// Merge with current page URL parameters
+			for (const [key, value] of page.url.searchParams.entries()) {
+				params.set(key, value);
+			}
+			
+			// Ensure page and page_size have default values
+			if (!params.has('page')) params.set('page', '1');
+			if (!params.has('page_size')) params.set('page_size', '10');
+			
+			fetchData(`${baseUrl}?${params.toString()}`);
 		}
 	});
 

@@ -21,7 +21,6 @@
 		selectedItem = item;
 		modalOpen = true;
 	};
-
 	const ignoreFields = ['url', 'id', 'beleg', 'orig_xml', 'number'];
 </script>
 
@@ -42,22 +41,22 @@
 		bind:loading={pagination.loading}
 		bind:error={pagination.error}
 	/>
-	<div class="overflow-x-auto rounded-lg border shadow">
-		<table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-			<thead class="bg-gray-50 text-xs text-gray-700 uppercase dark:bg-gray-700 dark:text-gray-400">
+	<div class="data-table-container">
+		<table class="data-table">
+			<thead class="data-table-header">
 				{#if pagination.data.results.length > 0}
 					<tr>
-						<th class="px-6 py-3">Edit</th>
+						<th class="data-table-header-cell">Edit</th>
 						{#each Object.keys(pagination.data.results[0]) as key}
-							<th class="px-6 py-3">{key}</th>
+							<th class="data-table-header-cell">{key}</th>
 						{/each}
 					</tr>
 				{/if}
 			</thead>
 			<tbody>
 				{#each pagination.data.results as item}
-					<tr class="max-h-18 border-b transition-colors duration-500">
-						<td class="px-3 py-2">
+					<tr class="data-table-row">
+						<td class="data-table-cell">
 							<Button onclick={() => openEditRowModal(item)}>
 								<EditOutline class="h-6 w-6 shrink-0" /><span class="sr-only">edit {item.id}</span>
 							</Button>
@@ -70,7 +69,7 @@
 								: item[key] !== null && item[key] !== undefined
 									? item[key]
 									: ''}
-							<td class="px-3 py-2">
+							<td class="data-table-cell">
 								<div class="line-clamp-3">
 									{cellValue}
 								</div>
