@@ -2,6 +2,8 @@
 
 <script>
 	import { page } from '$app/state';
+	import { previousUrl } from '$lib/stores/navigation';
+
 	import { Button, Heading, P } from 'flowbite-svelte';
 	import { EditOutline } from 'flowbite-svelte-icons';
 	// import { SENSE_BASE_URL } from '$lib/constants.js';
@@ -15,12 +17,11 @@
 	import EditRowModal from '$lib/components/EditRowModal.svelte';
 
 	let endpoint = page.params.endpoint;
-	console.log(endpoint);
-
 	const SENSE_BASE_URL = `${ROUTE_MAPPER[endpoint]}?beleg=${page.params.slug}`;
 
 	const pageTitle = $derived(`${endpoint} / ${page.params.slug}`);
 	const pagination = usePagination(SENSE_BASE_URL);
+	const backUrl = $derived(`${$previousUrl}#${page.params.slug}`);
 
 	let modalOpen = $state(false);
 	let selectedItem = $state(null);
@@ -37,6 +38,15 @@
 
 <Mybreadcrumb {pageTitle} />
 <Heading tag="h1">{pageTitle}</Heading>
+{#if $previousUrl}
+	<div class="py-4 text-center">
+		<a
+			href={backUrl}
+			class="inline-block rounded-lg bg-blue-700 px-5 py-2.5 text-center text-xl font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+			>Go back</a
+		>
+	</div>
+{/if}
 {#if pagination.loading}
 	<TableLoad></TableLoad>
 {:else if pagination.error}

@@ -1,5 +1,7 @@
 <script>
 	import { resolve } from '$app/paths';
+	import { beforeNavigate, afterNavigate } from '$app/navigation';
+	import { previousUrl } from '$lib/stores/navigation';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { APP_NAME } from '$lib/constants';
@@ -20,6 +22,16 @@
 	import { UserCircleOutline, UserSettingsOutline } from 'flowbite-svelte-icons';
 	import { GithubSolid } from 'flowbite-svelte-icons';
 	let { children } = $props();
+
+	let lastUrl;
+
+	beforeNavigate(() => {
+		lastUrl = window.location.pathname + window.location.search;
+	});
+
+	afterNavigate(() => {
+		previousUrl.set(lastUrl);
+	});
 </script>
 
 <svelte:head>
