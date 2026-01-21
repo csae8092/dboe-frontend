@@ -4,11 +4,13 @@
 	import Mybreadcrumb from '$lib/components/Mybreadcrumb.svelte';
 	import TableLoad from '$lib/components/TableLoad.svelte';
 	import TableNav from '$lib/components/TableNav.svelte';
-	import { Badge, Heading, tags } from 'flowbite-svelte';
+	import { Badge, Button, Heading, Modal, Input, Label } from 'flowbite-svelte';
 	let pageTitle = 'Sammlungen';
 	const COLLECTION_BASE_URL = 'http://127.0.0.1:8000/api/collections/';
 	import { usePagination } from '$lib/usePagination.svelte';
 	const pagination = usePagination(COLLECTION_BASE_URL);
+	let formModal = $state(false);
+	let error = $state('');
 </script>
 
 <svelte:head>
@@ -29,6 +31,7 @@
 		bind:error={pagination.error}
 	/>
 {/if}
+<Button onclick={() => (formModal = true)}>Filter</Button>
 
 {#if pagination.data.results.length > 0}
 	<div class="data-table-container">
@@ -63,3 +66,20 @@
 		</table>
 	</div>
 {/if}
+
+<Modal bind:open={formModal} size="xs">
+	<form>
+		<div class="flex flex-col space-y-6">
+			<h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Sign in to our platform</h3>
+			{#if error}
+				<Label color="red">{error}</Label>
+			{/if}
+			<Label class="space-y-2">
+				<span>Title</span>
+				<Input type="input" name="title" placeholder="test" required />
+			</Label>
+
+			<Button type="submit">Filter</Button>
+		</div>
+	</form>
+</Modal>
