@@ -4,11 +4,12 @@
 	import { P, ButtonGroup, Button, Label, Select } from 'flowbite-svelte';
 	import { ChevronDoubleLeftOutline, ChevronDoubleRightOutline } from 'flowbite-svelte-icons';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 
 	let { pageSize = $bindable(), data = $bindable(), loading = $bindable(), error = $bindable() } = $props();
 
 	function updateURL(pageNum, size) {
-		const params = new URLSearchParams();
+		const params = new URLSearchParams(page.url.searchParams);
 		params.set('page', pageNum);
 		params.set('page_size', size);
 		goto(`?${params.toString()}`, { replaceState: false, noScroll: true });
