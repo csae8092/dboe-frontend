@@ -8,6 +8,7 @@ export const AUTH_URL = `${API_BASE_URL}api-token-auth/`;
 
 
 export const ROUTE_MAPPER = {
-    bedeutung: SENSE_BASE_URL,
-    kontexte: `${API_BASE_URL}api/kontexte/`
+    bedeutungen: SENSE_BASE_URL,
+    kontexte: `${API_BASE_URL}api/kontexte/`,
+    lautungen: `${API_BASE_URL}api/lautungen/`
 }
