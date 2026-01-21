@@ -31,9 +31,6 @@
 
 <Mybreadcrumb {pageTitle} />
 <Heading tag="h1">{pageTitle}</Heading>
-{#if modifiedBeleg}
-	<Heading tag="h2">{modifiedBeleg}</Heading>
-{/if}
 
 {#if pagination.loading}
 	<TableLoad></TableLoad>

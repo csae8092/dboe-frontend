@@ -1,3 +1,5 @@
+<svelte:options runes={true} />
+
 <script>
 	import { resolve } from '$app/paths';
 	import { beforeNavigate, afterNavigate } from '$app/navigation';
@@ -90,7 +92,7 @@
 			<NavLi href={resolve('/')}>Home</NavLi>
 			<NavLi href={resolve('/about')}>About</NavLi>
 			<NavLi href={resolve('/belege')}>Belege</NavLi>
-			<NavLi href={resolve('/senses')}>Bedeutungen</NavLi>
+			<NavLi href={resolve('/sammlungen')}>Sammlungen</NavLi>
 		</NavUl>
 	</Navbar>
 
