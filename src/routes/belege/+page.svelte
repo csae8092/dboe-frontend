@@ -100,5 +100,5 @@
 {/if}
 
 <EditRowModal bind:open={modalOpen} rowData={selectedItem} userToken={$user.usertoken} {ignoreFields}>
-	{user}</EditRowModal
->
+	{user}
+</EditRowModal>
