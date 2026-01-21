@@ -1,6 +1,7 @@
 <svelte:options runes={true} />
 
 <script>
+	import { page } from '$app/stores';
 	import { ROUTE_MAPPER } from '$lib/constants';
 	import Mybreadcrumb from '$lib/components/Mybreadcrumb.svelte';
 	import TableLoad from '$lib/components/TableLoad.svelte';
@@ -21,6 +22,7 @@
 		selectedItem = item;
 		modalOpen = true;
 	};
+	let modifiedBeleg = $derived($page.url.hash ? $page.url.hash.slice(1) : null);
 </script>
 
 <svelte:head>
@@ -29,6 +31,9 @@
 
 <Mybreadcrumb {pageTitle} />
 <Heading tag="h1">{pageTitle}</Heading>
+{#if modifiedBeleg}
+	<Heading tag="h2">{modifiedBeleg}</Heading>
+{/if}
 
 {#if pagination.loading}
 	<TableLoad></TableLoad>
@@ -55,7 +60,10 @@
 			</thead>
 			<tbody>
 				{#each pagination.data.results as item}
-					<tr class="data-table-row">
+					<tr
+						class="data-table-row {modifiedBeleg === item.id ? 'bg-green-200 transition-colors duration-500' : ''}"
+						id={item.id}
+					>
 						<td class="data-table-cell">
 							<Button>
 								Edit <ChevronDownOutline></ChevronDownOutline>
