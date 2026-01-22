@@ -30,8 +30,8 @@
 		bind:loading={pagination.loading}
 		bind:error={pagination.error}
 	/>
+	<Button onclick={() => (formModal = true)}>Filter</Button>
 {/if}
-<Button onclick={() => (formModal = true)}>Filter</Button>
 
 {#if pagination.data.results.length > 0}
 	<div class="data-table-container">
