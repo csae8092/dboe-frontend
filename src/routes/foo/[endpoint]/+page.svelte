@@ -1,17 +1,20 @@
 <script>
-	import { Button, Dropdown, DropdownItem, DropdownDivider, Hr, P } from 'flowbite-svelte';
+	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { beforeNavigate, afterNavigate } from '$app/navigation';
+
+	import { Button, Dropdown, DropdownItem, DropdownDivider, Hr, P } from 'flowbite-svelte';
 	import { ChevronDownOutline, EditOutline } from 'flowbite-svelte-icons';
+
 	import NewTableNav from '$lib/components/NewTableNav.svelte';
 	import TableSize from '$lib/components/TableSize.svelte';
 	import EditRowModal from '$lib/components/EditRowModal.svelte';
-	import { beforeNavigate, afterNavigate } from '$app/navigation';
-	import { onMount } from 'svelte';
 	import { ROUTE_MAPPER } from '$lib/constants';
+	import { user } from '$lib/stores';
+
 	let { data } = $props();
 	let loading = $state(false);
 	let modifiedBeleg = $derived($page.url.hash ? $page.url.hash.slice(1) : null);
-	import { user } from '$lib/stores';
 	const ignoreFields = ['url', 'id', 'beleg', 'orig_xml'];
 	let modalOpen = $state(false);
 	let selectedItem = $state(null);
