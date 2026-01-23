@@ -1,5 +1,7 @@
+
 import { API_BASE_URL } from '$lib/constants.js';
 import { replaceSearch } from '$lib/utils.js';
+export const prerender = false;
 
 export async function load  ({ fetch, url, route, params }) {
     let query_string = new URLSearchParams(Object.fromEntries(url.searchParams));
