@@ -113,6 +113,4 @@
 	userToken={$user.usertoken}
 	{ignoreFields}
 	on:rowUpdated={handleRowUpdated}
->
-	{user}
-</EditRowModal>
+></EditRowModal>
