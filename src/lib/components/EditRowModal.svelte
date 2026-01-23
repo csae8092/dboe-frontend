@@ -2,10 +2,13 @@
 
 <script>
 	import { Modal, Input, Label, Button, Heading } from 'flowbite-svelte';
+	import { createEventDispatcher } from 'svelte';
 	let { open = $bindable(false), rowData, ignoreFields, userToken } = $props();
 
 	// Create editable copy to preserve original data
 	let editableData = $state({});
+
+	const dispatch = createEventDispatcher();
 
 	$effect(() => {
 		if (rowData && open) {
@@ -39,8 +42,8 @@
 			if (response.ok) {
 				const data = await response.json();
 				console.log(data);
-				// Update original rowData with successful changes
-				Object.assign(rowData, editableData);
+				// Dispatch event to parent with updated row
+				dispatch('rowUpdated', { updatedRow: editableData });
 				open = false;
 			} else {
 				const data = await response.json();

@@ -16,18 +16,30 @@
 	let modalOpen = $state(false);
 	let selectedItem = $state(null);
 
+	// Make table data reactive by copying from load result
+	let tableData = $state([]);
+	$effect(() => {
+		tableData = data.payload.results ? [...data.payload.results] : [];
+	});
+
 	const openEditRowModal = (item) => {
 		selectedItem = item;
 		modalOpen = true;
 	};
 
-	onMount(() => {
-		beforeNavigate(() => {
-			loading = true;
-		});
-		afterNavigate(() => {
-			loading = false;
-		});
+	function handleRowUpdated(event) {
+		const updatedRow = event.detail.updatedRow;
+		const idx = tableData.findIndex((r) => r.id === updatedRow.id);
+		if (idx !== -1) {
+			tableData[idx] = { ...updatedRow };
+		}
+	}
+
+	beforeNavigate(() => {
+		loading = true;
+	});
+	afterNavigate(() => {
+		loading = false;
 	});
 </script>
 
@@ -39,17 +51,17 @@
 <div class="data-table-container">
 	<table class="data-table">
 		<thead class="data-table-header">
-			{#if data.payload.results.length > 0}
+			{#if tableData.length > 0}
 				<tr>
 					<th class="data-table-header-cell">Edit</th>
-					{#each Object.keys(data.payload.results[0]) as key}
+					{#each Object.keys(tableData[0]) as key}
 						<th class="data-table-header-cell">{key}</th>
 					{/each}
 				</tr>
 			{/if}
 		</thead>
 		<tbody>
-			{#each data.payload.results as item}
+			{#each tableData as item}
 				<tr
 					class="data-table-row {modifiedBeleg === item.id ? 'bg-green-200 transition-colors duration-500' : ''}"
 					id={item.id}
@@ -95,6 +107,12 @@
 		</tbody>
 	</table>
 </div>
-<EditRowModal bind:open={modalOpen} rowData={selectedItem} userToken={$user.usertoken} {ignoreFields}>
+<EditRowModal
+	bind:open={modalOpen}
+	rowData={selectedItem}
+	userToken={$user.usertoken}
+	{ignoreFields}
+	on:rowUpdated={handleRowUpdated}
+>
 	{user}
 </EditRowModal>
