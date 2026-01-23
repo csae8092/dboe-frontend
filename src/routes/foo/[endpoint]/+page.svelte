@@ -1,11 +1,6 @@
 <script>
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { Hr, Button, ButtonGroup, P, PaginationNav } from 'flowbite-svelte';
-	import { ChevronDoubleLeftOutline, ChevronDoubleRightOutline } from 'flowbite-svelte-icons';
-
+	import { Hr, P } from 'flowbite-svelte';
 	import NewTableNav from '$lib/components/NewTableNav.svelte';
-
 	let { data } = $props();
 </script>
 
