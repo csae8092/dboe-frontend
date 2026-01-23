@@ -12,9 +12,11 @@
 	}
 </script>
 
-<Label for="page_size">Items per page:</Label>
-<Select id="page_size" onchange={handlePageSizeChange} class="w-24">
-	<option value="10">10</option>
-	<option value="20">20</option>
-	<option value="40">40</option>
-</Select>
+<div>
+	<Label for="page_size">Items per page:</Label>
+	<Select id="page_size" onchange={handlePageSizeChange}>
+		<option value="10">10</option>
+		<option value="20">20</option>
+		<option value="40">40</option>
+	</Select>
+</div>
