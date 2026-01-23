@@ -22,8 +22,8 @@ export async function load  ({ fetch, url, route, params }) {
     }
 
     return {
+        page_title: params.endpoint,
         url: url,
-        route: route.id,
         payload: payload,
         previous_page: previous_page,
         next_page: next_page

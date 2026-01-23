@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { beforeNavigate, afterNavigate } from '$app/navigation';
 
-	import { Button, Dropdown, DropdownItem, DropdownDivider, Hr, P } from 'flowbite-svelte';
+	import { Button, Dropdown, DropdownItem, DropdownDivider, Hr, P, Heading } from 'flowbite-svelte';
 	import { ChevronDownOutline, EditOutline } from 'flowbite-svelte-icons';
 
 	import NewTableNav from '$lib/components/NewTableNav.svelte';
@@ -46,9 +46,12 @@
 	});
 </script>
 
-<NewTableNav {data} {loading}></NewTableNav>
-<P>{data.payload.count}</P>
-<TableSize></TableSize>
+<Heading tag="h1" class="pt-3 pb-2 text-center">{data.page_title}</Heading>
+<div class="text-center">
+	<NewTableNav {data} {loading}></NewTableNav>
+	<P class="text-center">{data.payload.count}</P>
+	<TableSize></TableSize>
+</div>
 <Hr />
 
 <div class="data-table-container">
