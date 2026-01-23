@@ -2,9 +2,12 @@ import { API_BASE_URL } from '$lib/constants.js';
 import { replaceSearch } from '$lib/utils.js';
 
 export async function load  ({ fetch, url, route, params }) {
-    const query_string = new URLSearchParams(Object.fromEntries(url.searchParams)).toString();
+    let query_string = new URLSearchParams(Object.fromEntries(url.searchParams));
+    if (!query_string.has('page_size')) {
+        query_string.set('page_size', '10');
+    }
     const fetch_data_path = `${API_BASE_URL}api/${params.endpoint}`
-    const fetch_data_url = `${fetch_data_path}${query_string ? '?' + query_string : ''}`
+    const fetch_data_url = `${fetch_data_path}${query_string ? '?' + query_string.toString() : ''}`
     const res = await fetch(fetch_data_url);
 	const payload = await res.json();
     let next_page = null;
